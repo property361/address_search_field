@@ -1,11 +1,11 @@
 import 'dart:async';
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:address_search_field/src/enums/address_id.dart';
 import 'package:address_search_field/src/models/address.dart';
 import 'package:address_search_field/src/notifiers/route_notifier.dart';
 import 'package:address_search_field/src/services/geo_methods.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Callback method.
 typedef OnDoneCallback = FutureOr<void> Function(Address address);
@@ -26,6 +26,8 @@ class AddressDialogStyle {
     this.color = Colors.blue,
     this.backgroundColor = Colors.white,
     this.useButtons = true,
+    this.iconColor = Colors.black,
+    this.textColor = Colors.black54,
   });
 
   /// Color for details in the widget.
@@ -36,6 +38,12 @@ class AddressDialogStyle {
 
   /// Sets if the [AddressSearchDialog] will have buttons at bottom.
   final bool useButtons;
+
+  /// Sets icon color
+  final Color iconColor;
+
+  //sets Text color
+  final Color textColor;
 }
 
 /// Texts for [AddressSearchDialog].
@@ -286,13 +294,14 @@ class _DefaultDialog extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 _SearchBar(
-                  size,
-                  controller,
-                  style.color,
-                  style.backgroundColor,
-                  texts.hintText,
-                  searchAddress,
-                ),
+                    size,
+                    controller,
+                    style.color,
+                    style.backgroundColor,
+                    texts.hintText,
+                    searchAddress,
+                    style.textColor,
+                    style.iconColor),
                 SizedBox(
                   width: size.width * 0.8,
                   child: const Divider(
@@ -301,13 +310,13 @@ class _DefaultDialog extends StatelessWidget {
                   ),
                 ),
                 _ResultsList(
-                  size,
-                  style.backgroundColor,
-                  snapshot,
-                  style.useButtons,
-                  texts.noResultsText,
-                  onSelected,
-                ),
+                    size,
+                    style.backgroundColor,
+                    snapshot,
+                    style.useButtons,
+                    texts.noResultsText,
+                    onSelected,
+                    style.textColor),
                 (style.useButtons)
                     ? SizedBox(
                         width: size.width * 0.8,
@@ -345,7 +354,9 @@ class _SearchBar extends StatelessWidget {
     this.color,
     this.backgroundColor,
     this.hintText,
-    this.searchAddress, {
+    this.searchAddress,
+    this.textColor,
+    this.iconColor, {
     Key? key,
   }) : super(key: key);
 
@@ -359,6 +370,12 @@ class _SearchBar extends StatelessWidget {
 
   /// Bakcground color for widget.
   final Color backgroundColor;
+
+  /// Textfiled color
+  final Color textColor;
+
+  /// Icon color
+  final Color iconColor;
 
   /// Message to show when the [TextField] of the widget is empty.
   final String hintText;
@@ -383,8 +400,8 @@ class _SearchBar extends StatelessWidget {
           Padding(
             padding:
                 EdgeInsets.only(left: (size.width * 0.8) * 0.03125), // 0.03125
-            child: const Icon(
-              Icons.location_city,
+            child: Icon(
+              Icons.location_city, color: iconColor,
               // size: (size.width * 0.8) * 0.0625,
             ),
           ),
@@ -397,6 +414,7 @@ class _SearchBar extends StatelessWidget {
               textCapitalization: TextCapitalization.words,
               cursorColor: color ?? Theme.of(context).primaryColor,
               onEditingComplete: searchAddress,
+              style: TextStyle(color: textColor),
               decoration: InputDecoration(
                 suffix: GestureDetector(
                   child: const Padding(
@@ -450,7 +468,8 @@ class _ResultsList extends StatelessWidget {
     this.snapshot,
     this.useButtons,
     this.noResultsText,
-    this.onSelected, {
+    this.onSelected,
+    this.textColor, {
     Key? key,
   }) : super(key: key);
 
@@ -458,6 +477,9 @@ class _ResultsList extends StatelessWidget {
 
   /// Bakcground color for
   final Color backgroundColor;
+
+  /// text color for
+  final Color textColor;
 
   /// Representation of the most recent interaction with an asynchronous computation.
   final AsyncSnapshot<List<Address>> snapshot;
@@ -493,7 +515,10 @@ class _ResultsList extends StatelessWidget {
                     separatorBuilder: (BuildContext context, int index) =>
                         const Divider(),
                     itemBuilder: (BuildContext context, int index) => ListTile(
-                      title: Text(snapshot.data![index].reference!),
+                      title: Text(
+                        snapshot.data![index].reference!,
+                        style: TextStyle(color: textColor),
+                      ),
                       onTap: () async =>
                           await onSelected(addressRef: snapshot.data![index]),
                     ),
